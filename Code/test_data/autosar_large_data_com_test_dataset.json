@@ -1,0 +1,218 @@
+[
+  {
+    "id": "LDCOM-001",
+    "category": "overview",
+    "difficulty": "easy",
+    "question": "What is the purpose of the AUTOSAR LdCom module, and where is it placed in the AUTOSAR layered architecture?",
+    "expected_answer": "LdCom specifies functionality, APIs, and configuration for Large Data COM. It is placed between the RTE and the PDU Router (PduR).",
+    "source_pages": "1, 5",
+    "must_include": "RTE | PDU Router | functionality, API, and configuration"
+  },
+  {
+    "id": "LDCOM-002",
+    "category": "overview",
+    "difficulty": "easy",
+    "question": "List the main features of LdCom.",
+    "expected_answer": "It provides a signal-oriented data interface for the RTE, provides received signals to the RTE, supports large and dynamic-length data types, supports IF- and TP-based communication, and provides a PDU-oriented data interface toward PduR.",
+    "source_pages": "5",
+    "must_include": "signal-oriented | dynamic-length | IF | TP | PduR"
+  },
+  {
+    "id": "LDCOM-003",
+    "category": "constraints",
+    "difficulty": "medium",
+    "question": "What prerequisites are listed for using Efficient COM?",
+    "expected_answer": "The PDU must contain only one signal and no ISignalGroup; the signal must be a fixed- or dynamic-length byte array; transmission mode must be triggered or triggered without repetition; transmission mode selection, update bit, minimum delay time, timeout supervision, byte-order conversion, Rx/Tx filtering, and signal invalidation must not be used.",
+    "source_pages": "8",
+    "must_include": "one Signal | byte array | triggered | no update bit | no timeout supervision | no byte order conversion"
+  },
+  {
+    "id": "LDCOM-004",
+    "category": "dependencies",
+    "difficulty": "medium",
+    "question": "What does LdCom require from the PDU Router?",
+    "expected_answer": "Incoming I-PDU indication, outgoing I-PDU sending including transmission confirmation, a trigger interface that lets PduR request transmission from LdCom, and data forwarding for TP communication.",
+    "source_pages": "9",
+    "must_include": "incoming I-PDUs | transmission confirmation | trigger | TP communication"
+  },
+  {
+    "id": "LDCOM-005",
+    "category": "initialization",
+    "difficulty": "easy",
+    "question": "What does LdCom_Init do, and what is its function signature?",
+    "expected_answer": "LdCom_Init initializes the module's internal data. Signature: void LdCom_Init(const LdCom_ConfigType* config).",
+    "source_pages": "12, 17",
+    "must_include": "LdCom_Init | const LdCom_ConfigType* config | void"
+  },
+  {
+    "id": "LDCOM-006",
+    "category": "initialization",
+    "difficulty": "easy",
+    "question": "What does LdCom_DeInit do?",
+    "expected_answer": "LdCom_DeInit de-initializes the module and puts LdCom into an uninitialized state.",
+    "source_pages": "12, 18",
+    "must_include": "uninitialized state"
+  },
+  {
+    "id": "LDCOM-007",
+    "category": "api",
+    "difficulty": "medium",
+    "question": "What does LdCom_GetVersionInfo return, and does it require prior initialization?",
+    "expected_answer": "It writes module version information to the supplied Std_VersionInfoType pointer. It is an exception that does not require prior LdCom_Init.",
+    "source_pages": "17, 18",
+    "must_include": "version information | does not require prior initialization"
+  },
+  {
+    "id": "LDCOM-008",
+    "category": "api",
+    "difficulty": "medium",
+    "question": "What is the signature and return meaning of LdCom_Transmit?",
+    "expected_answer": "Std_ReturnType LdCom_Transmit(PduIdType Id, const PduInfoType* InfoPtr). E_OK means the request was accepted; E_NOT_OK means it was not accepted.",
+    "source_pages": "19",
+    "must_include": "PduIdType Id | const PduInfoType* InfoPtr | E_OK | E_NOT_OK"
+  },
+  {
+    "id": "LDCOM-009",
+    "category": "transmission",
+    "difficulty": "medium",
+    "question": "When LdCom_Transmit is invoked for IF communication, what does LdCom do next?",
+    "expected_answer": "It invokes PduR_LdComTransmit, replacing the Signal Id with the corresponding PDU Id.",
+    "source_pages": "13",
+    "must_include": "PduR_LdComTransmit | Signal Id | PDU Id"
+  },
+  {
+    "id": "LDCOM-010",
+    "category": "transmission",
+    "difficulty": "medium",
+    "question": "In TP transmission, what are LdCom_CopyTxData and LdCom_TpTxConfirmation used for?",
+    "expected_answer": "LdCom forwards these callbacks to Rte_LdComCbkCopyTxData_<sn> and Rte_LdComCbkTpTxConfirmation_<sn>, selected using the PDU Id.",
+    "source_pages": "13, 20, 21",
+    "must_include": "Rte_LdComCbkCopyTxData | Rte_LdComCbkTpTxConfirmation | PDU Id"
+  },
+  {
+    "id": "LDCOM-011",
+    "category": "reception",
+    "difficulty": "medium",
+    "question": "Which RTE callback does LdCom call when LdCom_RxIndication is invoked?",
+    "expected_answer": "It calls Rte_LdComCbkRxIndication_<sn>, based on the PDU Id passed to LdCom_RxIndication.",
+    "source_pages": "14",
+    "must_include": "Rte_LdComCbkRxIndication | PDU Id"
+  },
+  {
+    "id": "LDCOM-012",
+    "category": "reception",
+    "difficulty": "medium",
+    "question": "What is the purpose of LdCom_StartOfReception, and what does bufferSizePtr represent?",
+    "expected_answer": "It is called at the start of receiving an N-SDU. bufferSizePtr reports available receive-buffer capacity; the function can report maximum currently available buffer size when TpSduLength is zero.",
+    "source_pages": "22",
+    "must_include": "start of receiving an N-SDU | available receive buffer | TpSduLength equal to 0"
+  },
+  {
+    "id": "LDCOM-013",
+    "category": "reception",
+    "difficulty": "medium",
+    "question": "What do BUFREQ_OK, BUFREQ_E_NOT_OK, and BUFREQ_E_OVFL mean for LdCom_StartOfReception?",
+    "expected_answer": "BUFREQ_OK means accepted and reception can continue; BUFREQ_E_NOT_OK means rejected; BUFREQ_E_OVFL means the required buffer cannot be provided and reception is aborted.",
+    "source_pages": "22, 23",
+    "must_include": "BUFREQ_OK | BUFREQ_E_NOT_OK | BUFREQ_E_OVFL"
+  },
+  {
+    "id": "LDCOM-014",
+    "category": "errors",
+    "difficulty": "medium",
+    "question": "Which development error codes and hexadecimal values are listed for uninitialized use, null pointer, invalid PDU/SDU ID, invalid Signal ID, and invalid configuration selection?",
+    "expected_answer": "LDCOM_E_UNINIT=0x02; LDCOM_E_PARAM_POINTER=0x03; LDCOM_E_INVALID_PDU_SDU_ID=0x04; LDCOM_E_INVALID_SIGNAL_ID=0x05; LDCOM_E_INIT_FAILED=0x06.",
+    "source_pages": "14, 15",
+    "must_include": "0x02 | 0x03 | 0x04 | 0x05 | 0x06"
+  },
+  {
+    "id": "LDCOM-015",
+    "category": "errors",
+    "difficulty": "easy",
+    "question": "Does the specification list runtime errors, transient faults, production errors, or extended production errors?",
+    "expected_answer": "No. It states there are no runtime errors, transient faults, production errors, or extended production errors.",
+    "source_pages": "15",
+    "must_include": "no runtime errors | no transient faults | no production errors"
+  },
+  {
+    "id": "LDCOM-016",
+    "category": "configuration",
+    "difficulty": "medium",
+    "question": "What does LdComApiType configure, and what are its two values?",
+    "expected_answer": "It defines whether an I-PDU is sent unfragmented or uses Transport Protocol communication. Values: LDCOM_IF and LDCOM_TP.",
+    "source_pages": "39, 40",
+    "must_include": "LDCOM_IF | LDCOM_TP | I-PDU"
+  },
+  {
+    "id": "LDCOM-017",
+    "category": "configuration",
+    "difficulty": "medium",
+    "question": "What values can LdComIPduDirection take?",
+    "expected_answer": "LDCOM_SEND and LDCOM_RECEIVE.",
+    "source_pages": "45",
+    "must_include": "LDCOM_SEND | LDCOM_RECEIVE"
+  },
+  {
+    "id": "LDCOM-018",
+    "category": "configuration",
+    "difficulty": "hard",
+    "question": "Under what configuration conditions are LdCom_CopyTxData and LdCom_TpTxConfirmation available?",
+    "expected_answer": "Only if at least one LdComIPdu has LdComIPduDirection=LDCOM_SEND and LdComApiType=LDCOM_TP.",
+    "source_pages": "19",
+    "must_include": "LDCOM_SEND | LDCOM_TP"
+  },
+  {
+    "id": "LDCOM-019",
+    "category": "configuration",
+    "difficulty": "hard",
+    "question": "Under what configuration conditions is LdCom_RxIndication available?",
+    "expected_answer": "Only if at least one LdComIPdu has LdComIPduDirection=LDCOM_RECEIVE and LdComApiType=LDCOM_IF.",
+    "source_pages": "19",
+    "must_include": "LDCOM_RECEIVE | LDCOM_IF"
+  },
+  {
+    "id": "LDCOM-020",
+    "category": "sequence",
+    "difficulty": "hard",
+    "question": "Summarize the TP transmission sequence between RTE, LdCom, and PduR.",
+    "expected_answer": "RTE calls LdCom_Transmit; LdCom forwards to PduR_LdComTransmit. During transmission, LdCom_CopyTxData and the RTE copy callback supply segments until complete. PduR reports completion through LdCom_TpTxConfirmation, forwarded to the matching RTE callback.",
+    "source_pages": "34",
+    "must_include": "LdCom_Transmit | PduR_LdComTransmit | LdCom_CopyTxData | LdCom_TpTxConfirmation"
+  },
+  {
+    "id": "LDCOM-021",
+    "category": "limitations",
+    "difficulty": "hard",
+    "question": "Does LdCom perform byte-order conversion, filtering, or signal invalidation for Efficient COM?",
+    "expected_answer": "No. Efficient COM transports opaque byte-wise data without byte-order conversion; the prerequisites exclude Rx/Tx filtering and signal invalidation.",
+    "source_pages": "8",
+    "must_include": "no byte-order conversion | no Rx/Tx filtering | no Signal Invalidation"
+  },
+  {
+    "id": "LDCOM-022",
+    "category": "negative_test",
+    "difficulty": "medium",
+    "question": "Does LdCom independently initiate periodic transmission?",
+    "expected_answer": "No. Transmission is initiated by the RTE through LdCom_Transmit or by PduR through TriggerTransmit, not by LdCom itself.",
+    "source_pages": "13",
+    "must_include": "not by LdCom on its own"
+  },
+  {
+    "id": "LDCOM-023",
+    "category": "negative_test",
+    "difficulty": "medium",
+    "question": "What is the exact default buffer size used by LdCom for every TP reception?",
+    "expected_answer": "The specification does not define one universal default buffer size for every TP reception. Available buffer capacity is reported through bufferSizePtr; do not invent a fixed value.",
+    "source_pages": "22",
+    "must_include": "does not define a universal default buffer size | bufferSizePtr"
+  },
+  {
+    "id": "LDCOM-024",
+    "category": "version",
+    "difficulty": "easy",
+    "question": "Which AUTOSAR release does this specification belong to, and what is its document identification number?",
+    "expected_answer": "AUTOSAR Classic Platform R20-11; Document ID 655.",
+    "source_pages": "1",
+    "must_include": "R20-11 | 655"
+  }
+]
